@@ -1,234 +1,141 @@
 <?php 
-    require_once("admin/inc/config.php");
-
-    $fetchingElections = mysqli_query($db, "SELECT * FROM elections") OR die(mysqli_error($db));
-    while($data = mysqli_fetch_assoc($fetchingElections))
-    {
-        $stating_date = $data['starting_date'];
-        $ending_date = $data['ending_date'];
-        $curr_date = date("Y-m-d");
-        $election_id = $data['id'];
-        $status = $data['status'];
-
-        if($status == "Active" && $ending_date>$curr_date)
-        {
-            $date1=date_create($curr_date);
-            $date2=date_create($ending_date);
-            $diff=date_diff($date1,$date2);
-            
-            if((int)$diff->format("%R%a") < 0)
-            {
-                mysqli_query($db, "UPDATE elections SET status = 'Expired' WHERE id = '". $election_id ."'") OR die(mysqli_error($db));
-            }
-        }else if($status == "InActive")
-        {
-            $date1=date_create($curr_date);
-            $date2=date_create($stating_date);
-            $diff=date_diff($date1,$date2);
-            
-
-            if((int)$diff->format("%R%a") <= 0)
-            {
-                mysqli_query($db, "UPDATE elections SET status = 'Active' WHERE id = '". $election_id ."'") OR die(mysqli_error($db));
-            }
-        }
-        
-
-    }
+    require_once("inc/header.php");
+    require_once("inc/navigation.php");
 ?>
 
+    <div class="row my-3">
+        <div class="col-12">
+        <h3 style="text-align: center; font-weight: bold; margin-bottom: 20px;">Voters Panel</h3>
+            
 
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Login - Online Voting System</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/login.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-	<div class="container h-100">
-		<div class="d-flex justify-content-center h-100">
-			<div class="user_card">
-				<div class="d-flex justify-content-center">
-					<div class="brand_logo_container">
-						<img src="assets/images/logo1.gif" class="brand_logo" alt="Logo">
-					</div>
-				</div>
 
-                <?php 
-                    if(isset($_GET['sign-up']))
-                    {
-                ?>
-                        <div class="d-flex justify-content-center form_container">
-                            <form method="POST">
-                                <div class="input-group mb-3">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    </div>
-                                    <input type="text" name="su_username" class="form-control input_user" placeholder="Username" required />
-                                </div>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                    </div>
-                                    <input type="password" name="su_password" class="form-control input_pass" placeholder="Password" required />
-                                </div>     
-                                <div class="input-group mb-2">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                    </div>
-                                    <input type="password" name="su_retype_password" class="form-control input_pass" placeholder="Retype Password" required />
-                                </div>
-                                
-                                    <div class="d-flex justify-content-center mt-3 login_container">
-                            <button type="submit" name="sign_up_btn" class="btn login_btn">Sign Up</button>
-                        </div>
-                            </form>
-                        </div>
-                
-                        <div class="mt-4">
-                            <div class="d-flex justify-content-center links text-white">
-                                Already Created Account? <a href="index.php" class="ml-2 text-white">Sign In</a>
-                            </div>
-                        </div>
-                <?php
-                    }else {
-                ?>
-                        <div class="d-flex justify-content-center form_container">
-                            <form method="POST">
-                                <div class="input-group mb-3">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    </div>
-                                    <input type="text" name="username" class="form-control input_user" placeholder="User Name" required />
-                                </div>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                    </div>
-                                    <input type="password" name="password" class="form-control input_pass" placeholder="Password" required />
-                                </div>
-                                    <div class="d-flex justify-content-center mt-3 login_container">
-                            <button type="submit" name="loginBtn" class="btn login_btn">Login</button>
-                        </div>
-                            </form>   
-                        </div>
-                
-                        <div class="mt-4">
-                            <div class="d-flex justify-content-center links text-white">
-                                Don't have an account? <a href="?sign-up=1" class="ml-2 text-white">Sign Up</a>
-                            </div>
-                            
-                        </div>
-                <?php
+            <?php 
+                $fetchingActiveElections = mysqli_query($db, "SELECT * FROM elections WHERE status = 'Active'") or die(mysqli_error($db));
+                while ($data = mysqli_fetch_assoc($fetchingActiveElections)) {
+                    $election_id = $data['id'];
+                    $end_date = $data['ending_date'];
+
+                    date_default_timezone_set('Asia/Kolkata');
+                    $current_date = date("Y-m-d H:i:s");                    
+                    if (strtotime($end_date) < strtotime($current_date)) {
+                        mysqli_query($db, "UPDATE elections SET status = 'Expired' WHERE id = $election_id") or die(mysqli_error($db));
                     }
-                    
-                ?>
-
-                <?php 
-                    if(isset($_GET['registered']))
-                    {
-                ?>
-                        <span class="bg-white text-success text-center my-3"> Your account has been created successfully! </span>
-                <?php
-                    }else if(isset($_GET['invalid'])) {
-                ?>
-                        <span class="bg-white text-danger text-center my-3"> Passwords mismatched, please try again! </span>
-                <?php
-                    }else if(isset($_GET['not_registered'])) {
-                ?>
-                        <span class="bg-white text-warning text-center my-3"> Sorry, you are not registered! </span>
-                <?php
-                    }else if(isset($_GET['invalid_access'])) {
-                ?>
-                        <span class="bg-white text-danger text-center my-3"> Invalid username or password! </span>
-                <?php
-                    }
-                ?>
-                       
-			</div>
-		</div>
-	</div>
-
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-
-</body>
-</html>
-
-<?php 
-    require_once("admin/inc/config.php");
-
-    if(isset($_POST['sign_up_btn']))
-    {
-        $su_username = mysqli_real_escape_string($db, $_POST['su_username']);
-        $su_password = mysqli_real_escape_string($db, sha1($_POST['su_password']));
-        $su_retype_password = mysqli_real_escape_string($db, sha1($_POST['su_retype_password']));
-        $user_role = "Voter"; 
-
-        if($su_password == $su_retype_password)
-        {
-
-            mysqli_query($db, "INSERT INTO users(username, password, user_role) VALUES('". $su_username ."', '". $su_password ."', '". $user_role ."')") or die(mysqli_error($db));
-
-        ?>
-            <script> location.assign("index.php?sign-up=1&registered=1"); </script>
-        <?php
-
-        }else {
-    ?>
-            <script> location.assign("index.php?sign-up=1&invalid=1"); </script>
-    <?php
-        }
-             
-    }else if(isset($_POST['loginBtn']))
-    {
-        $username = mysqli_real_escape_string($db, $_POST['username']);
-        $password = mysqli_real_escape_string($db, sha1($_POST['password']));
-        
-
-        $fetchingData = mysqli_query($db, "SELECT * FROM users WHERE username = '". $username ."'") or die(mysqli_error($db));
-
-        
-        if(mysqli_num_rows($fetchingData) > 0)
-        {
-            $data = mysqli_fetch_assoc($fetchingData);
-
-            if($username == $data['username'] AND $password == $data['password'])
-            {
-                session_start();
-                $_SESSION['user_role'] = $data['user_role'];
-                $_SESSION['username'] = $data['username'];
-                $_SESSION['user_id'] = $data['id'];
-                
-                if($data['user_role'] == "Admin")
-                {
-                    $_SESSION['key'] = "AdminKey";
-            ?>
-                    <script> location.assign("admin/index.php?homepage=1"); </script>
-            <?php
-                }else {
-                    $_SESSION['key'] = "VotersKey";
-            ?>
-                    <script> location.assign("voters/index.php"); </script>
-            <?php
                 }
+                
+                $totalActiveElections = mysqli_num_rows($fetchingActiveElections);
 
-            }else {
-        ?>
-                <script> location.assign("index.php?invalid_access=1"); </script>
-        <?php
+                if($totalActiveElections > 0) 
+                {
+                    while($data = mysqli_fetch_assoc($fetchingActiveElections))
+                    {
+                        $election_id = $data['id'];
+                        $election_topic = $data['election_topic'];    
+                ?>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" class="bg-green text-white"><h5> ELECTION TOPIC: <?php echo strtoupper($election_topic); ?></h5></th>
+                                </tr>
+                                <tr>
+                                    <th> Photo </th>
+                                    <th> Candidate Details </th>
+                                    <th> # of Votes </th>
+                                    <th> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php 
+                                $fetchingCandidates = mysqli_query($db, "SELECT * FROM candidate_details WHERE election_id = '". $election_id ."'") or die(mysqli_error($db));
+                                $details = $fetchingCandidates;
+                                while($candidateData = mysqli_fetch_assoc($details))
+                                {
+                                    $candidate_id = $candidateData['id'];
+                                    $candidate_photo = $candidateData['candidate_photo'];
+
+                                    $fetchingVotes = mysqli_query($db, "SELECT * FROM votings WHERE candidate_id = '". $candidate_id . "'") or die(mysqli_error($db));
+                                    $totalVotes = mysqli_num_rows($fetchingVotes);
+
+                            ?>
+                                    <tr>
+                                        <td> <img src="<?php echo $candidate_photo; ?>" class="candidate_photo"> </td>
+                                        <td><?php echo "<b>" . $candidateData['candidate_name'] . "</b><br />" . $candidateData['candidate_details']; ?></td>
+                                        <td><?php echo $totalVotes; ?></td>
+                                        <td>
+                                    <?php
+                                            $checkIfVoteCasted = mysqli_query($db, "SELECT * FROM votings WHERE voters_id = '". $_SESSION['user_id'] ."' AND election_id = '". $election_id ."'") or die(mysqli_error($db));    
+                                            $isVoteCasted = mysqli_num_rows($checkIfVoteCasted);
+
+                                            if($isVoteCasted > 0)
+                                            {
+                                                $voteCastedData = mysqli_fetch_assoc($checkIfVoteCasted);
+                                                $voteCastedToCandidate = $voteCastedData['candidate_id'];
+
+                                                if($voteCastedToCandidate == $candidate_id)
+                                                {
+                                    ?>
+
+                                                    <img src="../assets/images/vote.png" width="100px;">
+                                    <?php
+                                                }
+                                            }else {
+                                    ?>
+                                                <button class="btn btn-md btn-success" onclick="CastVote(<?php echo $election_id; ?>, <?php echo $candidate_id; ?>, <?php echo $_SESSION['user_id']; ?>)"> Vote </button>
+                                    <?php
+                                            }
+
+                                            
+                                    ?>
+
+
+                                    </td>
+                                    </tr>
+                            <?php
+                                }
+                            ?>
+                            </tbody>
+
+                        </table>
+                <?php
+                    
+                    }
+                }else {
+                    echo ' <div style="text-align: center;"><strong><h4>No Active Elections !</h4></strong></div>';
+                }
+            ?>
+
+            
+        </div>
+    </div>
+
+    <script>
+    const CastVote = (election_id, customer_id, voters_id) => {
+        const currentDate = new Date();
+        const voteDate = currentDate.toISOString().split('T')[0]; 
+        const voteTime = currentDate.toTimeString().split(' ')[0]; 
+
+        $.ajax({
+            type: "POST", 
+            url: "inc/ajaxCalls.php",
+            data: {
+                e_id: election_id,
+                c_id: customer_id,
+                v_id: voters_id,
+                vote_date: voteDate, 
+                vote_time: voteTime 
+            },
+            success: function(response) {
+                if (response == "Success") {
+                    location.assign("index.php?voteCasted=1");
+                } else {
+                    location.assign("index.php?voteNotCasted=1");
+                }
             }
-
-
-        }else {
-    ?>
-            <script> location.assign("index.php?sign-up=1&not_registered=1"); </script>
-    <?php
-
-        }
-
+        });
     }
+</script>
 
+
+
+<?php
+    require_once("inc/footer.php");
 ?>
