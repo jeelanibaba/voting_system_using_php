@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php 
+            <?php 
                     $fetchingData = mysqli_query($db, "SELECT * FROM elections") or die(mysqli_error($db)); 
                     $isAnyElectionAdded = mysqli_num_rows($fetchingData);
 
@@ -44,7 +44,7 @@
                     }else {
             ?>
                         <tr> 
-                            <td colspan="7"> No any election is added yet. </td>
+                            <td colspan="7"> No election is added yet. </td>
                         </tr>
             <?php
                     }
