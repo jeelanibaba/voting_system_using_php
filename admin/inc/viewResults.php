@@ -6,7 +6,15 @@
 
 <div class="row my-3">
     <div class="col-12">
-        <h3> Election Results </h3>
+    <!-- <h3 style="text-align: center; font-weight: bold;">Election Results</h3> -->
+    <div style="text-align: center;">
+    <div style="background-color: #f0f0f0; border: 1px solid #000; padding: 10px; width: 20%; margin: 0 auto;">
+        <h3 style="font-weight: bold; margin: 0;">Election Results</h3>
+    </div>
+</div>
+
+
+
 
         <?php 
         $fetchingActiveElections = mysqli_query($db, "SELECT * FROM elections WHERE id = '". $election_id ."'") or die(mysqli_error($db));
@@ -16,20 +24,23 @@
             while ($data = mysqli_fetch_assoc($fetchingActiveElections)) {
                 $election_id = $data['id'];
                 $election_topic = $data['election_topic'];
-                $status = $data['status']; // Get the election status
+                $status = $data['status'];
 
                 if ($status === 'Expired') {
-                    $fetchWinnerQuery = mysqli_query($db, "SELECT candidate_id, MAX(vote_count) as max_votes FROM candidate_votes WHERE election_id = $election_id") or die(mysqli_error($db));
+                    $fetchWinnerQuery = mysqli_query($db, "SELECT candidate_id, COUNT(voters_id) as vote_count FROM votings WHERE election_id = $election_id GROUP BY candidate_id ORDER BY vote_count DESC LIMIT 1") or die(mysqli_error($db));
                     $winnerData = mysqli_fetch_assoc($fetchWinnerQuery);
                     $winner_candidate_id = $winnerData['candidate_id'];
-
+                
                     $fetchWinnerDetailsQuery = mysqli_query($db, "SELECT * FROM candidate_details WHERE id = $winner_candidate_id") or die(mysqli_error($db));
                     $winnerDetails = mysqli_fetch_assoc($fetchWinnerDetailsQuery);
-                    $winnerName = $winnerDetails['candidate_name'];
-                    $winnerRole = $winnerDetails['candidate_role'];
+                    $winnerName = $winnerDetails['candidate_name'];                
+                    echo "<h4>$winnerName has been elected as $election_topic </h4>";
+                    echo "<h4>Congratulations $winnerName 🎉👏🥳</h4>";
 
-                    echo "<h4>$winnerName has been elected as $winnerRole</h4>";
                 }
+                
+                
+                
         ?>
                 <table class="table">
                     <thead>
