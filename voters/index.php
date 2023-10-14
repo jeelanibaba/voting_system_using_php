@@ -5,11 +5,23 @@
 
     <div class="row my-3">
         <div class="col-12">
-            <h3 style="text-align: center; font-weight: bold;">Voters Panel</h3>
+        <h3 style="text-align: center; font-weight: bold; margin-bottom: 20px;">Voters Panel</h3>
+            
 
 
             <?php 
                 $fetchingActiveElections = mysqli_query($db, "SELECT * FROM elections WHERE status = 'Active'") or die(mysqli_error($db));
+                while ($data = mysqli_fetch_assoc($fetchingActiveElections)) {
+                    $election_id = $data['id'];
+                    $end_date = $data['ending_date'];
+
+                    date_default_timezone_set('Asia/Kolkata');
+                    $current_date = date("Y-m-d H:i:s");                    
+                    if (strtotime($end_date) < strtotime($current_date)) {
+                        mysqli_query($db, "UPDATE elections SET status = 'Expired' WHERE id = $election_id") or die(mysqli_error($db));
+                    }
+                }
+                
                 $totalActiveElections = mysqli_num_rows($fetchingActiveElections);
 
                 if($totalActiveElections > 0) 
@@ -34,8 +46,8 @@
                             <tbody>
                             <?php 
                                 $fetchingCandidates = mysqli_query($db, "SELECT * FROM candidate_details WHERE election_id = '". $election_id ."'") or die(mysqli_error($db));
-
-                                while($candidateData = mysqli_fetch_assoc($fetchingCandidates))
+                                $details = $fetchingCandidates;
+                                while($candidateData = mysqli_fetch_assoc($details))
                                 {
                                     $candidate_id = $candidateData['id'];
                                     $candidate_photo = $candidateData['candidate_photo'];
@@ -87,7 +99,7 @@
                     
                     }
                 }else {
-                    echo "No any active election.";
+                    echo ' <div style="text-align: center;"><strong><h4>No Active Elections !</h4></strong></div>';
                 }
             ?>
 
