@@ -31,14 +31,15 @@
 ?>
 
 
-<div class="row my-3">
-    <div class="col-4">
-        <h3>Add New Candidates</h3>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <select class="form-control" name="election_id" required> 
-                    <option value=""> Select Election </option>
-                    <?php 
+<div class="container-fluid">
+    <div class="row my-3">
+        <div class="col-lg-4 col-md-6">
+            <h3>Add New Candidates</h3>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <select class="form-control" name="election_id" required> 
+                        <option value="">Select Election</option>
+<?php 
                         $fetchingElections = mysqli_query($db, "SELECT * FROM elections") OR die(mysqli_error($db));
                         $isAnyElectionAdded = mysqli_num_rows($fetchingElections);
                         if($isAnyElectionAdded > 0)
@@ -66,36 +67,36 @@
                     <?php
                         }
                     ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <input type="text" name="candidate_name" placeholder="Candidate Name" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <input type="file" name="candidate_photo" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <input type="text" name="candidate_details" placeholder="Candidate Details" class="form-control" required />
-            </div>
-            <input type="submit" value="Add Candidate" name="addCandidateBtn" class="btn btn-success" />
-        </form>
-    </div>   
 
-    <div class="col-8">
-        <h3>Candidate Details</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">S.No</th>
-                    <th scope="col">Photo</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Details</th>
-                    <th scope="col">Election</th>
-                    <th scope="col">Action </th>
-                    
-                </tr>
-            </thead>
-            <tbody>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="candidate_name" placeholder="Candidate Name" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <input type="file" name="candidate_photo" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <input type="text" name="candidate_details" placeholder="Candidate Details" class="form-control" required />
+                </div>
+                <input type="submit" value="Add Candidate" name="addCandidateBtn" class="btn btn-success" />
+            </form>
+        </div>
+        <div class="col-lg-8 col-md-6">
+            <h3>Candidate Details</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">S.No</th>
+                            <th scope="col">Photo</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Details</th>
+                            <th scope="col">Election</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                 <?php 
                     $fetchingData = mysqli_query($db, "SELECT * FROM candidate_details") or die(mysqli_error($db)); 
                     $isAnyCandidateAdded = mysqli_num_rows($fetchingData);
@@ -133,12 +134,12 @@
             <?php
                     }
                 ?>
-            </tbody>    
-        </table>
+                    </tbody>    
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-
-
 
 <?php 
 
