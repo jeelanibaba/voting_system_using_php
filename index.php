@@ -1,40 +1,20 @@
 <?php 
     require_once("admin/inc/config.php");
 
-    $fetchingElections = mysqli_query($db, "SELECT * FROM elections") OR die(mysqli_error($db));
-    while($data = mysqli_fetch_assoc($fetchingElections))
-    {
-        $stating_date = $data['starting_date'];
+    $fetchingElections = mysqli_query($db, "SELECT * FROM elections") or die(mysqli_error($db));
+    while ($data = mysqli_fetch_assoc($fetchingElections)) {
         $ending_date = $data['ending_date'];
-        $curr_date = date("Y-m-d");
+        date_default_timezone_set('Asia/Kolkata');
+        $curr_date = date("m-d-Y");
         $election_id = $data['id'];
         $status = $data['status'];
-
-        if($status == "Active" && $ending_date>$curr_date)
-        {
-            $date1=date_create($curr_date);
-            $date2=date_create($ending_date);
-            $diff=date_diff($date1,$date2);
-            
-            if((int)$diff->format("%R%a") < 0)
-            {
-                mysqli_query($db, "UPDATE elections SET status = 'Expired' WHERE id = '". $election_id ."'") OR die(mysqli_error($db));
-            }
-        }else if($status == "InActive")
-        {
-            $date1=date_create($curr_date);
-            $date2=date_create($stating_date);
-            $diff=date_diff($date1,$date2);
-            
-
-            if((int)$diff->format("%R%a") <= 0)
-            {
-                mysqli_query($db, "UPDATE elections SET status = 'Active' WHERE id = '". $election_id ."'") OR die(mysqli_error($db));
-            }
+    
+        if ($status == "Active" && strtotime($ending_date) > strtotime($curr_date)) {
+            mysqli_query($db, "UPDATE elections SET status = 'Expired' WHERE id = $election_id") or die(mysqli_error($db));
         }
-        
-
+        echo "\n$election_id and $status \n";
     }
+    
 ?>
 
 
