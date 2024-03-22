@@ -1,4 +1,3 @@
-
 <?php 
     if(isset($_GET['added']))
     {
@@ -22,46 +21,45 @@
     }
 ?>
 
-
-
-
-<div class="row my-3">
-    <div class="col-4">
-        <h3>Add New Election</h3>
-        <form method="POST">
-            <div class="form-group">
-                <input type="text" name="election_topic" placeholder="Election Topic" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <input type="number" name="number_of_candidates" placeholder="No of Candidates" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <input type="text" onfocus="this.type='Date'" name="starting_date" placeholder="Starting Date" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <input type="text" onfocus="this.type='Date'" name="ending_date" placeholder="Ending Date" class="form-control" required />
-            </div>
-            <input type="submit" value="Add Election" name="addElectionBtn" class="btn btn-success" />
-        </form>
-    </div>
-
-    <div class="col-8">
-        <h3>Elections</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">S.No</th>
-                    <th scope="col">Election Name</th>
-                    <th scope="col"># Candidates</th>
-                    <th scope="col">Starting Date</th>
-                    <th scope="col">Ending Date</th>
-                    <th scope="col">Status </th>
-                    <th scope="col">Action </th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
+<div class="container-fluid">
+    <div class="row justify-content-center my-3">
+        <div class="col-lg-10">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>Add New Election</h3>
+                    <form method="POST">
+                        <div class="form-group">
+                            <input type="text" name="election_topic" placeholder="Election Topic" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="number" name="number_of_candidates" placeholder="No of Candidates" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="starting_date" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="ending_date" class="form-control" required />
+                        </div>
+                        <input type="submit" value="Add Election" name="addElectionBtn" class="btn btn-success" />
+                    </form>
+                </div>
+                <div class="col-md-8">
+                    <h3>Elections</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">S.No</th>
+                                    <th scope="col">Election Name</th>
+                                    <th scope="col"># Candidates</th>
+                                    <th scope="col">Starting Date</th>
+                                    <th scope="col">Ending Date</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                                <?php 
                     $fetchingData = mysqli_query($db, "SELECT * FROM elections") or die(mysqli_error($db)); 
                     $isAnyElectionAdded = mysqli_num_rows($fetchingData);
 
@@ -94,11 +92,14 @@
             <?php
                     }
                 ?>
-            </tbody>    
-        </table>
+                            </tbody>    
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 
 <script>
     const DeleteData = (e_id) => 
@@ -121,11 +122,7 @@
         $starting_date = mysqli_real_escape_string($db, $_POST['starting_date']);
         $ending_date = mysqli_real_escape_string($db, $_POST['ending_date']);
         $inserted_by = $_SESSION['username'];
-        $inserted_on = date("Y-m-d");
 
-
-        $date1=date_create($inserted_on);
-        $date2=date_create($starting_date);
         $inserted_on = date("m/d/y");
         $current_date = date("m/d/y");
 
@@ -142,3 +139,4 @@
 
     }
 ?>
+
